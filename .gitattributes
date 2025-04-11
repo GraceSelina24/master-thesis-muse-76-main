@@ -1,0 +1,86 @@
+# Auto detect text files and perform LF normalization
+* text=auto
+
+# Custom for Windows
+*.{cmd,[cC][mM][dD],bat,[bB][aA][tT] text eol=crlf
+*.{ps1,[pP][sS]1} text eol=crlf
+*.{reg,[rR][eE][gG]} text eol=crlf
+
+# Custom for Unix
+*.sh text eol=lf
+
+# Custom for Documentation
+*.md text diff=markdown
+*.markdown text diff=markdown
+*.mdwn text diff=markdown
+*.mdown text diff=markdown
+
+# Custom for Images
+*.png binary
+*.jpg binary
+*.gif binary
+*.ico binary
+*.mov binary
+*.mp4 binary
+*.mp3 binary
+*.flv binary
+*.fla binary
+*.swf binary
+*.gz binary
+*.zip binary
+*.7z binary
+*.ttf binary
+*.eot binary
+*.woff binary
+*.woff2 binary
+
+# Custom for Source code
+*.css text
+*.html text
+*.js text
+*.json text
+*.jsx text
+*.ts text
+*.tsx text
+*.py text
+*.php text
+*.pl text
+*.pm text
+*.rb text
+*.sh text
+*.xml text
+*.xsl text
+*.yaml text
+*.yml text
+*.sql text
+*.c text
+*.cpp text
+*.h text
+*.hpp text
+*.cs text
+*.m text
+*.mm text
+*.swift text
+*.go text
+*.rs text
+*.dart text
+*.kt text
+*.kts text
+*.gradle text
+*.properties text
+*.ini text
+*.toml text
+*.lock text
+*.log text
+*.txt text
+*.rtf text
+*.csv text
+*.tsv text
+*.ps1 text
+*.bat text
+*.cmd text
+*.reg text
+*.inf text
+*.ini text
+*.url text
+*.lnk text 

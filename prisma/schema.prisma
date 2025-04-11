@@ -1,0 +1,110 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String   @id @default(cuid())
+  name      String
+  email     String   @unique
+  password  String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  settings   UserSettings? @relation("UserToSettings")
+  healthData HealthData[]  @relation("UserToHealthData")
+  meals      Meal[]        @relation("UserToMeals")
+  workouts   Workout[]     @relation("UserToWorkouts")
+}
+
+model UserSettings {
+  id                  String    @id @default(cuid())
+  userId              String    @unique
+  theme               String    @default("system")
+  language            String    @default("en")
+  createdAt           DateTime  @default(now())
+  updatedAt           DateTime  @updatedAt
+  apiKeys             Json      @default("[]")
+  appVersion          String    @default("1.0.0")
+  autoSync            Boolean   @default(true)
+  backupFrequency     String    @default("weekly")
+  billingAddress      Json?
+  calorieUnit         String    @default("kcal")
+  colorBlindMode      Boolean   @default(false)
+  connectedApps       Json      @default("[]")
+  cookiePreferences   Json      @default("{}")
+  dataSharing         Json      @default("{}")
+  debugMode           Boolean   @default(false)
+  developerMode       Boolean   @default(false)
+  distanceUnit        String    @default("km")
+  emailNotifications  Boolean   @default(true)
+  fontSize            String    @default("medium")
+  goalNotifications   Boolean   @default(true)
+  heightUnit          String    @default("cm")
+  highContrastMode    Boolean   @default(false)
+  lastBackup          DateTime?
+  lastFeedbackDate    DateTime?
+  mealReminders       Boolean   @default(true)
+  paymentMethod       String?
+  progressUpdates     Boolean   @default(true)
+  pushNotifications   Boolean   @default(true)
+  reminderTime        String    @default("08:00")
+  screenReaderMode    Boolean   @default(false)
+  subscriptionEndDate DateTime?
+  subscriptionStatus  String    @default("free")
+  syncFrequency       String    @default("daily")
+  textToSpeech        Boolean   @default(false)
+  twoFactorEnabled    Boolean   @default(false)
+  weightUnit          String    @default("kg")
+  workoutReminders    Boolean   @default(true)
+  user                User      @relation(fields: [userId], references: [id], onDelete: Cascade, name: "UserToSettings")
+}
+
+model HealthData {
+  id            String   @id @default(cuid())
+  userId        String
+  weight        Float?
+  height        Float?
+  bmi           Float?
+  bloodPressure String?
+  heartRate     Int?
+  date          DateTime @default(now())
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  user          User     @relation(fields: [userId], references: [id], name: "UserToHealthData")
+}
+
+model Meal {
+  id          String   @id @default(cuid())
+  userId      String
+  name        String
+  description String?
+  calories    Int
+  protein     Float?
+  carbs       Float?
+  fat         Float?
+  image       String?
+  type        String?
+  date        DateTime @default(now())
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  user        User     @relation(fields: [userId], references: [id], name: "UserToMeals")
+}
+
+model Workout {
+  id          String   @id @default(cuid())
+  userId      String
+  name        String
+  description String?
+  duration    Int
+  calories    Int?
+  date        DateTime @default(now())
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  user        User     @relation(fields: [userId], references: [id], name: "UserToWorkouts")
+}
