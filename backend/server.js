@@ -5,12 +5,18 @@ import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import dotenv from 'dotenv';
+import express from 'express';
 
 dotenv.config();
 
 const prisma = new PrismaClient();
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
+
+const app = express();
+
+// Serve static files from the public directory
+app.use('/images', express.static(path.join(__dirname, '..', 'public', 'images')));
 
 // Make sure the public/images/meals directory exists
 const mealImagesDir = path.join(__dirname, '..', 'public', 'images', 'meals');
@@ -66,7 +72,7 @@ const meals = [
     protein: 12,
     carbs: 54,
     fat: 7,
-    image: "https://media.istockphoto.com/id/1948035995/photo/overnight-oats.jpg?s=612x612&w=0&k=20&c=tfjJcDR8UL1pIyH220ZdWdAPVjIeWKCcFYwQa3weJpU=",
+    image: "https://images.unsplash.com/photo-1517673132405-a56a62b18caf?auto=format&fit=crop&q=80&w=1476",
     type: "breakfast"
   },
   {
@@ -212,7 +218,7 @@ const meals = [
     protein: 6,
     carbs: 25,
     fat: 12,
-    image: "https://plus.unsplash.com/premium_photo-1699986147008-d8d620f863bf?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D", // Updated URL
+    image: "https://images.unsplash.com/photo-1478145799258-573d68fd36b1?auto=format&fit=crop&q=80&w=1528",
     type: "snack"
   },
   {
@@ -243,7 +249,7 @@ const meals = [
     carbs: 15,
     fat: 12,
     image: "https://images.pexels.com/photos/704569/pexels-photo-704569.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=750&w=1260",
-    type: "snack" // Ensure this is consistent
+    type: "snack"
   },
 ];
 
@@ -252,16 +258,36 @@ async function seedMeals() {
   console.log('Starting meal seeding process...');
   
   try {
+    // First, get a user to associate the meals with
     const user = await prisma.user.findFirst();
+    
     if (!user) {
       console.error('No users found in the database. Please create a user first.');
       return;
     }
+    
     console.log(`Found user: ${user.name} (${user.id})`);
     
+    // Download all images first
     for (let i = 0; i < meals.length; i++) {
       const meal = meals[i];
+      const imageName = `meal-${i + 1}.jpg`;
+      const localPath = path.join(mealImagesDir, imageName);
       
+      // Download the image (if it doesn't exist)
+      if (!fs.existsSync(localPath)) {
+        console.log(`Downloading image for ${meal.name}...`);
+        await downloadImage(meal.image, localPath);
+      } else {
+        console.log(`Image for ${meal.name} already exists, skipping download.`);
+      }
+      
+      // Update the image path to the local file path (relative to public)
+      meal.image = `/images/meals/${imageName}`;
+    }
+    
+    // Create all meals in the database
+    for (const meal of meals) {
       // Check if the meal already exists to avoid duplicates
       const existingMeal = await prisma.meal.findFirst({
         where: {
@@ -269,43 +295,12 @@ async function seedMeals() {
           name: meal.name
         }
       });
-
+      
       if (existingMeal) {
-        console.log(`Meal "${meal.name}" already exists, updating it.`);
-        await prisma.meal.update({
-          where: { id: existingMeal.id },
-          data: {
-            description: meal.description,
-            calories: meal.calories,
-            protein: meal.protein,
-            carbs: meal.carbs,
-            fat: meal.fat,
-            image: meal.image,
-            type: meal.type,
-            date: new Date()
-          }
-        });
+        console.log(`Meal "${meal.name}" already exists, skipping.`);
         continue;
       }
-
-      const imageName = `meal-${i + 1}.jpg`;
-      const localPath = path.join(mealImagesDir, imageName);
-
-      // Download the image (if it doesn't exist)
-      if (!fs.existsSync(localPath)) {
-        console.log(`Downloading image for ${meal.name}...`);
-        const downloadSuccess = await downloadImage(meal.image, localPath);
-        if (!downloadSuccess) {
-          console.error(`Failed to download image for ${meal.name}, skipping meal.`);
-          continue;
-        }
-      } else {
-        console.log(`Image for ${meal.name} already exists, skipping download.`);
-      }
-
-      // Update the image path to the local file path (relative to public)
-      meal.image = `/images/meals/${imageName}`;
-
+      
       // Create the meal
       const createdMeal = await prisma.meal.create({
         data: {
@@ -318,9 +313,10 @@ async function seedMeals() {
           fat: meal.fat,
           image: meal.image,
           type: meal.type,
-          date: new Date(),
+          date: new Date(), // Using current date
         }
       });
+      
       console.log(`Created meal: ${createdMeal.name} (${createdMeal.id})`);
     }
     

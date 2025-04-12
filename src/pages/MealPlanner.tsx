@@ -27,15 +27,15 @@ interface MealType {
   image: string;
   ingredients: string[];
   tags: string[];
-  mealType: 'breakfast' | 'lunch' | 'dinner' | 'snack';
+  mealType: 'breakfast' | 'lunch' | 'dinner' | 'snacks';
 }
 
 interface MealPlan {
   date: string;
   meals: {
-    breakfast?: MealType;
-    lunch?: MealType;
-    dinner?: MealType;
+    breakfast?: MealType[];
+    lunch?: MealType[];
+    dinner?: MealType[];
     snacks?: MealType[];
   };
 }
@@ -50,14 +50,15 @@ const MealPlanner = () => {
   const [mealPlan, setMealPlan] = useState<MealPlan>({
     date: new Date().toISOString().split('T')[0],
     meals: {
-      breakfast: undefined,
-      lunch: undefined,
-      dinner: undefined,
+      breakfast: [],
+      lunch: [],
+      dinner: [],
       snacks: []
     }
   });
 
   useEffect(() => {
+    // Update the meal type mapping to handle 'snack' from the database
     const fetchMeals = async () => {
       try {
         setIsLoading(true);
@@ -87,20 +88,12 @@ const MealPlanner = () => {
           // Ensure image URL is properly constructed
           let imageUrl = 'https://placehold.co/600x400?text=No+Image';
           
-          // If image path exists
           if (meal.image) {
-            console.log('Raw image path from DB:', meal.image);
-            
-            // If it's a full URL, use it directly
             if (meal.image.startsWith('http')) {
               imageUrl = meal.image;
-            } 
-            // If it's a relative path, construct the full URL - fix the URL construction
-            else if (meal.image.startsWith('/images/')) {
-              // Use window.location.origin to get the current origin dynamically
+            } else if (meal.image.startsWith('/images/')) {
               const apiBase = 'http://localhost:3001';
               imageUrl = `${apiBase}${meal.image}`;
-              console.log('Image URL constructed:', imageUrl);
             }
           }
           
@@ -114,7 +107,7 @@ const MealPlanner = () => {
             image: imageUrl,
             ingredients: meal.description ? meal.description.split(', ') : [],
             tags: [(meal.type || 'meal').charAt(0).toUpperCase() + (meal.type || 'meal').slice(1)],
-            mealType: (meal.type as 'breakfast' | 'lunch' | 'dinner' | 'snack') || 'snack'
+            mealType: meal.type === 'snack' ? 'snacks' : (meal.type as 'breakfast' | 'lunch' | 'dinner' | 'snacks') || 'snacks'
           };
         });
         
@@ -145,7 +138,7 @@ const MealPlanner = () => {
         breakfast: getMealsByType('breakfast').length, 
         lunch: getMealsByType('lunch').length,
         dinner: getMealsByType('dinner').length,
-        snack: getMealsByType('snack').length
+        snacks: getMealsByType('snacks').length
       });
       
       // Debug log for image URLs
@@ -158,6 +151,27 @@ const MealPlanner = () => {
         img.onerror = () => console.error(`❌ Failed to load image for ${meal.title}`);
         img.src = meal.image;
       });
+    }
+  }, [dbMeals]);
+
+  // Add debug logs to ensure snacks functionality is working
+  useEffect(() => {
+    if (dbMeals.length > 0) {
+      console.log('All available meals in database:', dbMeals);
+      console.log('Meal types breakdown:', {
+        breakfast: getMealsByType('breakfast').length,
+        lunch: getMealsByType('lunch').length,
+        dinner: getMealsByType('dinner').length,
+        snacks: getMealsByType('snacks').length, // Debug log for snacks
+      });
+
+      // Debug log for snacks availability
+      const snacks = getMealsByType('snacks');
+      if (snacks.length === 0) {
+        console.warn('No snacks available in the database');
+      } else {
+        console.log('Available snacks:', snacks);
+      }
     }
   }, [dbMeals]);
 
@@ -175,22 +189,21 @@ const MealPlanner = () => {
   });
 
   const handleAddMeal = (meal: MealType) => {
-    setMealPlan(prev => {
+    setMealPlan((prev) => {
       const newMeals = { ...prev.meals };
-      if (meal.mealType === 'snack') {
-        newMeals.snacks = [...(newMeals.snacks || []), meal];
-      } else {
-        newMeals[meal.mealType] = meal;
+      if (meal.mealType === 'snacks' || meal.mealType === 'breakfast' || meal.mealType === 'lunch' || meal.mealType === 'dinner') {
+        const mealArray = newMeals[meal.mealType] || []; // Ensure the array exists
+        newMeals[meal.mealType] = [...mealArray, meal];
       }
-      return { ...prev, meals: newMeals };
+      return { ...prev, date: new Date().toISOString().split('T')[0], meals: newMeals };
     });
   };
 
   const handleRemoveMeal = (mealId: string, type: keyof MealPlan['meals']) => {
     setMealPlan(prev => {
       const newMeals = { ...prev.meals };
-      if (type === 'snacks') {
-        newMeals.snacks = newMeals.snacks?.filter(snack => snack.id !== mealId);
+      if (Array.isArray(newMeals[type])) {
+        newMeals[type] = newMeals[type]?.filter(meal => meal.id !== mealId) as MealType[];
       } else {
         newMeals[type] = undefined;
       }
@@ -206,19 +219,14 @@ const MealPlanner = () => {
       fat: 0
     };
 
-    Object.values(mealPlan.meals).forEach(meal => {
-      if (Array.isArray(meal)) {
-        meal.forEach(snack => {
-          total.calories += snack.calories;
-          total.protein += snack.protein;
-          total.carbs += snack.carbs;
-          total.fat += snack.fat;
+    Object.values(mealPlan.meals).forEach((mealArray) => {
+      if (Array.isArray(mealArray)) {
+        mealArray.forEach((meal) => {
+          total.calories += meal.calories;
+          total.protein += meal.protein;
+          total.carbs += meal.carbs;
+          total.fat += meal.fat;
         });
-      } else if (meal) {
-        total.calories += meal.calories;
-        total.protein += meal.protein;
-        total.carbs += meal.carbs;
-        total.fat += meal.fat;
       }
     });
 
@@ -261,81 +269,100 @@ const MealPlanner = () => {
                     </p>
                   </div>
                 ) : (
-                  dbMeals.slice(0, 6).map((meal) => (
-                    <Card key={meal.id} className="overflow-hidden hover:shadow-md transition-shadow">
-                      <div className="relative aspect-video bg-gray-100">
-                        <div className="absolute inset-0 flex items-center justify-center z-10 bg-gray-100">
-                          <div className="w-6 h-6 border-2 border-primary border-t-transparent rounded-full animate-spin"></div>
-                        </div>
-                        
-                        <img 
-                          src={meal.image}
-                          alt={meal.title}
-                          className="w-full h-full object-cover z-20 relative"
-                          onError={(e) => {
-                            console.error(`Failed to load image for ${meal.title}:`, meal.image);
-                            (e.target as HTMLImageElement).src = 'https://placehold.co/600x400?text=No+Image';
-                            (e.target as HTMLImageElement).parentElement?.querySelector('.absolute')?.classList.add('hidden');
-                          }}
-                          onLoad={(e) => {
-                            console.log(`Successfully loaded image for ${meal.title}`);
-                            (e.target as HTMLImageElement).parentElement?.querySelector('.absolute')?.classList.add('hidden');
-                          }}
-                        />
-                        <div className="absolute top-2 right-2 z-30">
-                          <Badge>{meal.mealType}</Badge>
-                        </div>
-                      </div>
-                      <CardContent className="p-3">
-                        <h3 className="font-semibold mb-1">{meal.title}</h3>
-                        <div className="flex justify-between text-sm text-gray-500">
-                          <span>{meal.calories} kcal</span>
-                          <span>{meal.protein}g protein</span>
-                        </div>
-                        <Button 
-                          variant="ghost" 
-                          size="sm" 
-                          className="w-full mt-2"
-                          onClick={() => handleAddMeal(meal)}
-                        >
-                          Add to Plan
-                        </Button>
-                      </CardContent>
-                    </Card>
-                  ))
+                  (() => {
+                    const displayedMealIds = new Set();
+                    return ['breakfast', 'lunch', 'dinner', 'snacks'].map((type) => {
+                      const mealOfType = dbMeals.find((meal) => meal.mealType === type && !displayedMealIds.has(meal.id));
+                      if (mealOfType) {
+                        displayedMealIds.add(mealOfType.id);
+                        return (
+                          <Card key={mealOfType.id} className="overflow-hidden hover:shadow-md transition-shadow flex flex-col justify-between">
+                            <div>
+                              <div className="relative aspect-video bg-gray-100">
+                                <img
+                                  src={mealOfType.image}
+                                  alt={mealOfType.title}
+                                  className="w-full h-full object-cover"
+                                  onError={(e) => {
+                                    (e.target as HTMLImageElement).src = 'https://placehold.co/600x400?text=No+Image';
+                                  }}
+                                />
+                                <div className="absolute top-2 right-2">
+                                  <Badge>{mealOfType.mealType}</Badge>
+                                </div>
+                              </div>
+                              <CardContent className="p-3">
+                                <h3 className="font-semibold mb-1">{mealOfType.title}</h3>
+                                <div className="flex justify-between text-sm text-gray-500">
+                                  <span>{mealOfType.calories} kcal</span>
+                                  <span>{mealOfType.protein}g protein</span>
+                                </div>
+                              </CardContent>
+                            </div>
+                            <div className="p-3">
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                className="w-full bg-primary text-white hover:bg-primary-dark transition-colors"
+                                onClick={() => handleAddMeal(mealOfType)}
+                              >
+                                <PlusCircle className="w-4 h-4 mr-2" />
+                                Add to Plan
+                              </Button>
+                            </div>
+                          </Card>
+                        );
+                      }
+                      return null;
+                    }).concat(
+                      ['lunch', 'dinner'].map((type) => {
+                        const mealOfType = dbMeals.find((meal) => meal.mealType === type && !displayedMealIds.has(meal.id));
+                        if (mealOfType) {
+                          displayedMealIds.add(mealOfType.id);
+                          return (
+                            <Card key={mealOfType.id} className="overflow-hidden hover:shadow-md transition-shadow flex flex-col justify-between">
+                              <div>
+                                <div className="relative aspect-video bg-gray-100">
+                                  <img
+                                    src={mealOfType.image}
+                                    alt={mealOfType.title}
+                                    className="w-full h-full object-cover"
+                                    onError={(e) => {
+                                      (e.target as HTMLImageElement).src = 'https://placehold.co/600x400?text=No+Image';
+                                    }}
+                                  />
+                                  <div className="absolute top-2 right-2">
+                                    <Badge>{mealOfType.mealType}</Badge>
+                                  </div>
+                                </div>
+                                <CardContent className="p-3">
+                                  <h3 className="font-semibold mb-1">{mealOfType.title}</h3>
+                                  <div className="flex justify-between text-sm text-gray-500">
+                                    <span>{mealOfType.calories} kcal</span>
+                                    <span>{mealOfType.protein}g protein</span>
+                                  </div>
+                                </CardContent>
+                              </div>
+                              <div className="p-3">
+                                <Button
+                                  variant="ghost"
+                                  size="sm"
+                                  className="w-full bg-primary text-white hover:bg-primary-dark transition-colors"
+                                  onClick={() => handleAddMeal(mealOfType)}
+                                >
+                                  <PlusCircle className="w-4 h-4 mr-2" />
+                                  Add to Plan
+                                </Button>
+                              </div>
+                            </Card>
+                          );
+                        }
+                        return null;
+                      })
+                    );
+                  })()
                 )}
               </div>
-              {dbMeals.length > 6 && (
-                <div className="text-center mt-4 space-y-4">
-                  <Button 
-                    variant="link"
-                    onClick={() => {
-                      // Find the meal library element and scroll to it
-                      const mealLibraryElement = document.getElementById('meal-library');
-                      if (mealLibraryElement) {
-                        mealLibraryElement.scrollIntoView({ 
-                          behavior: 'smooth',
-                          block: 'start'
-                        });
-                      } else {
-                        console.error('Meal library element not found');
-                      }
-                    }}
-                  >
-                    View all {dbMeals.length} meals
-                  </Button>
-                  
-                  {/* Debug: Direct link to check image existence */}
-                  <div className="text-xs text-gray-500">
-                    <p>Having trouble with images? Try these direct links:</p>
-                    <div className="flex flex-wrap gap-2 justify-center mt-1">
-                      <a href="http://localhost:3001/images/meals/meal-1.jpg" target="_blank" className="underline">Image 1</a>
-                      <a href="http://localhost:3001/images/meals/meal-2.jpg" target="_blank" className="underline">Image 2</a>
-                      <a href="http://localhost:3001/list-images" target="_blank" className="underline">Check Available Images</a>
-                    </div>
-                  </div>
-                </div>
-              )}
             </CardContent>
           </Card>
 
@@ -347,28 +374,28 @@ const MealPlanner = () => {
                   <div className="flex justify-between items-center">
                     <CardTitle>Today's Plan</CardTitle>
                     <div className="flex gap-2">
-                      <Button variant="outline" size="sm">
-                        <Calendar className="w-4 h-4 mr-2" />
-                        Change Date
-                      </Button>
-                      <Button variant="outline" size="sm" onClick={() => {
-                        const breakfastMeal = getRandomMeal('breakfast');
-                        const lunchMeal = getRandomMeal('lunch');
-                        const dinnerMeal = getRandomMeal('dinner');
-                        const snackMeal = getRandomMeal('snack');
-                        
-                        const newPlan: MealPlan = {
-                          date: new Date().toISOString().split('T')[0],
-                          meals: {
-                            breakfast: breakfastMeal || undefined,
-                            lunch: lunchMeal || undefined,
-                            dinner: dinnerMeal || undefined,
-                            snacks: snackMeal ? [snackMeal] : []
-                          }
-                        };
-                        
-                        setMealPlan(newPlan);
-                      }}>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => {
+                          const breakfastMeal = getRandomMeal('breakfast');
+                          const lunchMeal = getRandomMeal('lunch');
+                          const dinnerMeal = getRandomMeal('dinner');
+                          const snackMeal = getRandomMeal('snacks');
+
+                          const newPlan: MealPlan = {
+                            date: new Date().toISOString().split('T')[0],
+                            meals: {
+                              breakfast: breakfastMeal ? [breakfastMeal] : [],
+                              lunch: lunchMeal ? [lunchMeal] : [],
+                              dinner: dinnerMeal ? [dinnerMeal] : [],
+                              snacks: snackMeal ? [snackMeal] : [],
+                            },
+                          };
+
+                          setMealPlan(newPlan);
+                        }}
+                      >
                         <RefreshCw className="w-4 h-4 mr-2" />
                         Generate Plan
                       </Button>
@@ -378,113 +405,60 @@ const MealPlanner = () => {
                 <CardContent>
                   <div className="space-y-6">
                     {/* Breakfast */}
-                    <div>
-                      <div className="flex justify-between items-center mb-2">
-                        <h3 className="font-semibold">Breakfast</h3>
-                        {mealPlan.meals.breakfast && (
-                          <Button variant="outline" size="sm" onClick={() => handleRemoveMeal(mealPlan.meals.breakfast?.id || '', 'breakfast')}>
-                            Remove
-                          </Button>
-                        )}
-                      </div>
-                      {mealPlan.meals.breakfast ? (
-                        <MealCard meal={mealPlan.meals.breakfast} />
-                      ) : (
-                        <Button 
-                          variant="outline" 
-                          className="w-full" 
-                          onClick={() => {
-                            const breakfastMeal = getRandomMeal('breakfast');
-                            if (breakfastMeal) handleAddMeal(breakfastMeal);
-                          }}
-                          disabled={isLoading || getMealsByType('breakfast').length === 0}
-                        >
-                          {isLoading ? 'Loading...' : 'Add Breakfast'}
-                        </Button>
-                      )}
-                    </div>
+                    <MealSection
+                      title="Breakfast"
+                      meals={mealPlan.meals.breakfast}
+                      mealType="breakfast"
+                      onAdd={() => {
+                        const meal = getRandomMeal('breakfast');
+                        if (meal) handleAddMeal(meal);
+                      }}
+                      onRemove={handleRemoveMeal}
+                      isLoading={isLoading}
+                      availableMeals={getMealsByType('breakfast')}
+                    />
 
                     {/* Lunch */}
-                    <div>
-                      <div className="flex justify-between items-center mb-2">
-                        <h3 className="font-semibold">Lunch</h3>
-                        {mealPlan.meals.lunch && (
-                          <Button variant="outline" size="sm" onClick={() => handleRemoveMeal(mealPlan.meals.lunch?.id || '', 'lunch')}>
-                            Remove
-                          </Button>
-                        )}
-                      </div>
-                      {mealPlan.meals.lunch ? (
-                        <MealCard meal={mealPlan.meals.lunch} />
-                      ) : (
-                        <Button 
-                          variant="outline" 
-                          className="w-full" 
-                          onClick={() => {
-                            const lunchMeal = getRandomMeal('lunch');
-                            if (lunchMeal) handleAddMeal(lunchMeal);
-                          }}
-                          disabled={isLoading || getMealsByType('lunch').length === 0}
-                        >
-                          {isLoading ? 'Loading...' : 'Add Lunch'}
-                        </Button>
-                      )}
-                    </div>
+                    <MealSection
+                      title="Lunch"
+                      meals={mealPlan.meals.lunch}
+                      mealType="lunch"
+                      onAdd={() => {
+                        const meal = getRandomMeal('lunch');
+                        if (meal) handleAddMeal(meal);
+                      }}
+                      onRemove={handleRemoveMeal}
+                      isLoading={isLoading}
+                      availableMeals={getMealsByType('lunch')}
+                    />
 
                     {/* Dinner */}
-                    <div>
-                      <div className="flex justify-between items-center mb-2">
-                        <h3 className="font-semibold">Dinner</h3>
-                        {mealPlan.meals.dinner && (
-                          <Button variant="outline" size="sm" onClick={() => handleRemoveMeal(mealPlan.meals.dinner?.id || '', 'dinner')}>
-                            Remove
-                          </Button>
-                        )}
-                      </div>
-                      {mealPlan.meals.dinner ? (
-                        <MealCard meal={mealPlan.meals.dinner} />
-                      ) : (
-                        <Button 
-                          variant="outline" 
-                          className="w-full" 
-                          onClick={() => {
-                            const dinnerMeal = getRandomMeal('dinner');
-                            if (dinnerMeal) handleAddMeal(dinnerMeal);
-                          }}
-                          disabled={isLoading || getMealsByType('dinner').length === 0}
-                        >
-                          {isLoading ? 'Loading...' : 'Add Dinner'}
-                        </Button>
-                      )}
-                    </div>
+                    <MealSection
+                      title="Dinner"
+                      meals={mealPlan.meals.dinner}
+                      mealType="dinner"
+                      onAdd={() => {
+                        const meal = getRandomMeal('dinner');
+                        if (meal) handleAddMeal(meal);
+                      }}
+                      onRemove={handleRemoveMeal}
+                      isLoading={isLoading}
+                      availableMeals={getMealsByType('dinner')}
+                    />
 
                     {/* Snacks */}
-                    <div>
-                      <div className="flex justify-between items-center mb-2">
-                        <h3 className="font-semibold">Snacks</h3>
-                        <Button 
-                          variant="outline" 
-                          size="sm" 
-                          onClick={() => {
-                            const snackMeal = getRandomMeal('snack');
-                            if (snackMeal) handleAddMeal(snackMeal);
-                          }}
-                          disabled={isLoading || getMealsByType('snack').length === 0}
-                        >
-                          {isLoading ? 'Loading...' : 'Add Snack'}
-                        </Button>
-                      </div>
-                      <div className="space-y-2">
-                        {mealPlan.meals.snacks?.map((snack) => (
-                          <div key={snack.id} className="flex items-center justify-between">
-                            <MealCard meal={snack} />
-                            <Button variant="ghost" size="sm" onClick={() => handleRemoveMeal(snack.id, 'snacks')}>
-                              Remove
-                            </Button>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
+                    <MealSection
+                      title="Snacks"
+                      meals={mealPlan.meals.snacks} // Ensure snacks array is passed correctly
+                      mealType="snacks" // Correctly match the key in the `mealPlan` object
+                      onAdd={() => {
+                        const meal = getRandomMeal('snacks'); // Get a random snack meal
+                        if (meal) handleAddMeal(meal); // Add the meal to the plan
+                      }}
+                      onRemove={handleRemoveMeal} // Remove snacks functionality
+                      isLoading={isLoading} // Ensure the button is not disabled
+                      availableMeals={getMealsByType('snacks')} // Filter available snacks
+                    />
                   </div>
                 </CardContent>
               </Card>
@@ -499,34 +473,10 @@ const MealPlanner = () => {
                 </CardHeader>
                 <CardContent>
                   <div className="space-y-4">
-                    <div>
-                      <div className="flex justify-between mb-1">
-                        <span>Calories</span>
-                        <span>{totalNutrition.calories} kcal</span>
-                      </div>
-                      <Progress value={Math.min((totalNutrition.calories / 2000) * 100, 100)} />
-                    </div>
-                    <div>
-                      <div className="flex justify-between mb-1">
-                        <span>Protein</span>
-                        <span>{totalNutrition.protein}g</span>
-                      </div>
-                      <Progress value={Math.min((totalNutrition.protein / 50) * 100, 100)} />
-                    </div>
-                    <div>
-                      <div className="flex justify-between mb-1">
-                        <span>Carbs</span>
-                        <span>{totalNutrition.carbs}g</span>
-                      </div>
-                      <Progress value={Math.min((totalNutrition.carbs / 250) * 100, 100)} />
-                    </div>
-                    <div>
-                      <div className="flex justify-between mb-1">
-                        <span>Fat</span>
-                        <span>{totalNutrition.fat}g</span>
-                      </div>
-                      <Progress value={Math.min((totalNutrition.fat / 70) * 100, 100)} />
-                    </div>
+                    <NutritionProgress label="Calories" value={totalNutrition.calories} max={2000} />
+                    <NutritionProgress label="Protein" value={totalNutrition.protein} max={50} />
+                    <NutritionProgress label="Carbs" value={totalNutrition.carbs} max={250} />
+                    <NutritionProgress label="Fat" value={totalNutrition.fat} max={70} />
                   </div>
                 </CardContent>
               </Card>
@@ -558,7 +508,7 @@ const MealPlanner = () => {
                           <SelectItem value="breakfast">Breakfast</SelectItem>
                           <SelectItem value="lunch">Lunch</SelectItem>
                           <SelectItem value="dinner">Dinner</SelectItem>
-                          <SelectItem value="snack">Snacks</SelectItem>
+                          <SelectItem value="snacks">Snacks</SelectItem>
                         </SelectContent>
                       </Select>
                     </div>
@@ -584,8 +534,8 @@ const MealPlanner = () => {
                                 <ChefHat className="w-12 h-12 text-gray-400 mb-4" />
                                 <p className="text-gray-500 mb-2">No meals found</p>
                                 <p className="text-sm text-gray-400">
-                                  {searchTerm || mealType !== "all" 
-                                    ? "Try adjusting your search filters" 
+                                  {searchTerm || mealType !== "all"
+                                    ? "Try adjusting your search filters"
                                     : "Add some meals to get started"}
                                 </p>
                               </div>
@@ -605,6 +555,7 @@ const MealPlanner = () => {
   );
 };
 
+// Define the MealCard component if not already defined
 const MealCard = ({ meal, onAdd }: { meal: MealType; onAdd?: () => void }) => {
   const [imageError, setImageError] = useState(false);
   const [imageLoading, setImageLoading] = useState(true);
@@ -621,15 +572,8 @@ const MealCard = ({ meal, onAdd }: { meal: MealType; onAdd?: () => void }) => {
           src={imageError ? "https://placehold.co/600x400?text=No+Image" : meal.image}
           alt={meal.title}
           className={`w-full h-full object-cover transition-opacity ${imageLoading ? 'opacity-0' : 'opacity-100'}`}
-          onError={(e) => {
-            console.error(`Failed to load image for ${meal.title}:`, meal.image);
-            setImageError(true);
-            setImageLoading(false);
-          }}
-          onLoad={() => {
-            console.log(`Successfully loaded image for ${meal.title}`);
-            setImageLoading(false);
-          }}
+          onError={() => setImageError(true)}
+          onLoad={() => setImageLoading(false)}
         />
         <div className="absolute top-2 right-2">
           {meal.tags.map((tag, index) => (
@@ -680,5 +624,65 @@ const MealCard = ({ meal, onAdd }: { meal: MealType; onAdd?: () => void }) => {
     </Card>
   );
 };
+
+// Helper components for better structure
+const MealSection = ({
+  title,
+  meals,
+  mealType,
+  onAdd,
+  onRemove,
+  isLoading,
+  availableMeals,
+}: {
+  title: string;
+  meals?: MealType[];
+  mealType: keyof MealPlan['meals'];
+  onAdd: () => void;
+  onRemove: (mealId: string, type: keyof MealPlan['meals']) => void;
+  isLoading: boolean;
+  availableMeals: MealType[];
+}) => (
+  <div>
+    <div className="flex justify-between items-center mb-2">
+      <h3 className="font-semibold">{title}</h3>
+      <Button
+        variant="outline"
+        size="sm"
+        onClick={onAdd}
+        disabled={isLoading || availableMeals.length === 0}
+      >
+        {isLoading ? 'Loading...' : `Add ${title}`}
+      </Button>
+    </div>
+    {meals && meals.length > 0 ? (
+      <div className="space-y-6">
+        {meals.map((meal) => (
+          <div key={meal.id}>
+            <div className="flex justify-between items-center mb-2">
+              <h3 className="font-semibold">{meal.title}</h3>
+              <Button variant="outline" size="sm" onClick={() => onRemove(meal.id, mealType)}>
+                Remove
+              </Button>
+            </div>
+            <MealCard meal={meal} />
+          </div>
+        ))}
+      </div>
+    ) : (
+      <p className="text-gray-500">No {title.toLowerCase()} meals added yet.</p>
+    )}
+  </div>
+);
+
+const NutritionProgress = ({ label, value, max }: { label: string; value: number; max: number }) => (
+  <div>
+    <div className="flex justify-between mb-1">
+      <span>{label}</span>
+      <span>{value} {label === 'Calories' ? 'kcal' : 'g'}</span>
+    </div>
+    <Progress value={Math.min((value / max) * 100, 100)} />
+  </div>
+);
 
 export default MealPlanner;

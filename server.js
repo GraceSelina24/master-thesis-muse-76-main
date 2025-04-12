@@ -186,12 +186,21 @@ app.get('/api/profile', authenticate, async (req, res) => {
 app.put('/api/profile', authenticate, async (req, res) => {
   try {
     const {
-      theme,
-      language,
+      name,
+      email,
+      height,
+      weight,
+      age,
+      gender,
+      activityLevel,
+      dietaryPreferences,
+      healthGoals,
       heightUnit,
       weightUnit,
       calorieUnit,
       distanceUnit,
+      theme,
+      language,
       emailNotifications,
       pushNotifications,
       mealReminders,
@@ -200,36 +209,36 @@ app.put('/api/profile', authenticate, async (req, res) => {
       goalNotifications
     } = req.body;
 
-    // In a real application, you would update these in the database
-    // For this mock implementation, we'll just return the data as if it was updated
-    
-    const updatedProfile = {
-      name: req.user.name,
-      email: req.user.email,
-      height: 180,
-      weight: 75,
-      age: 30,
-      gender: 'Male',
-      activityLevel: 'Moderate',
-      dietaryPreferences: ['Vegetarian', 'Low Sugar', 'High Protein'],
-      healthGoals: ['Weight Loss', 'Muscle Gain', 'Better Sleep'],
-      heightUnit: heightUnit || 'cm',
-      weightUnit: weightUnit || 'kg',
-      calorieUnit: calorieUnit || 'kcal',
-      distanceUnit: distanceUnit || 'km',
-      theme: theme || 'system',
-      language: language || 'en',
-      emailNotifications: emailNotifications !== undefined ? emailNotifications : true,
-      pushNotifications: pushNotifications !== undefined ? pushNotifications : true,
-      mealReminders: mealReminders !== undefined ? mealReminders : true,
-      workoutReminders: workoutReminders !== undefined ? workoutReminders : true,
-      progressUpdates: progressUpdates !== undefined ? progressUpdates : true,
-      goalNotifications: goalNotifications !== undefined ? goalNotifications : true,
-      subscriptionStatus: 'free',
-      subscriptionEndDate: null
-    };
-    
-    res.json(updatedProfile);
+    // Update the user profile in the database
+    const updatedUser = await prisma.user.update({
+      where: { id: req.user.id },
+      data: {
+        name,
+        email,
+        height,
+        weight,
+        age,
+        gender,
+        activityLevel,
+        dietaryPreferences,
+        healthGoals,
+        heightUnit,
+        weightUnit,
+        calorieUnit,
+        distanceUnit,
+        theme,
+        language,
+        emailNotifications,
+        pushNotifications,
+        mealReminders,
+        workoutReminders,
+        progressUpdates,
+        goalNotifications
+      }
+    });
+
+    // Return the updated profile
+    res.json(updatedUser);
   } catch (error) {
     console.error('Update profile error:', error);
     res.status(500).json({ message: 'Failed to update profile data' });
@@ -546,11 +555,12 @@ app.get('/list-images', (req, res) => {
   
   try {
     if (fs.existsSync(mealsDir)) {
+      // Ensure all meal images are included in the response
       const files = fs.readdirSync(mealsDir);
       console.log('Found files:', files);
       res.json({
         path: mealsDir,
-        files,
+        files, // Send all files in the directory
         count: files.length,
         message: 'These are the available meal images'
       });
