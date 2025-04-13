@@ -148,7 +148,13 @@ const Register = () => {
             <Button 
               variant="outline" 
               className="w-full bg-white gap-2"
-              onClick={() => signInWithGoogle()}
+              onClick={async () => {
+                try {
+                  await signInWithGoogle();
+                } catch (error) {
+                  console.error('Google sign-up error:', error);
+                }
+              }}
               disabled={loading}
             >
               <svg className="h-5 w-5 mr-2" viewBox="0 0 24 24">

@@ -129,28 +129,30 @@ export function AuthProvider({ children }: AuthProviderProps) {
       setLoading(true);
       setError(null);
 
-      // Check if Firebase is properly configured
-      if (firebaseAuth.app.options.apiKey === "AIzaSyDrhwWyowrqxXpOCS2_30pmVh1gZ72ypBQ" || 
-          firebaseAuth.app.options.apiKey === undefined) {
+      // Ensure Firebase is properly configured
+      if (!firebaseAuth.app.options.apiKey) {
         toast.error('Firebase is not configured. Please add your Firebase config in src/lib/firebase.ts');
         throw new Error('Firebase configuration missing. See src/lib/firebase.ts for instructions.');
       }
 
       // Sign in with Google using Firebase
       const result = await signInWithPopup(firebaseAuth, googleProvider);
-      
-      // Send token to our backend to authenticate
+
+      // Send token to backend for authentication
       const userData = await auth.googleAuth(result);
       setUser(userData.user);
-      
+
       toast.success('Successfully signed in with Google!');
       navigate('/dashboard');
     } catch (err) {
-      console.error('Google sign in error:', err);
-      
-      // Provide more helpful error messages
+      console.error('Google sign-in error:', err);
+
+      // Handle specific error codes
       if (err instanceof Error) {
-        if (err.message.includes('auth/api-key-not-valid')) {
+        if (err.message.includes('auth/popup-closed-by-user')) {
+          setError('Sign-in popup was closed before completing the process.');
+          toast.error('Sign-in popup was closed. Please try again.');
+        } else if (err.message.includes('auth/api-key-not-valid')) {
           setError('Firebase API key is not valid. Please update your Firebase configuration.');
           toast.error('Firebase API key is not valid. Please update your Firebase configuration.');
         } else {
@@ -222,4 +224,4 @@ export function useAuth() {
     throw new Error('useAuth must be used within an AuthProvider');
   }
   return context;
-} 
+}
