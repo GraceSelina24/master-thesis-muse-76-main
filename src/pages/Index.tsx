@@ -10,6 +10,7 @@ import {
   ShieldCheck, 
   Sparkles, 
   CheckCircle2,
+  AlertCircle,
   ArrowRight
 } from 'lucide-react';
 
@@ -27,8 +28,6 @@ const Index = () => {
             <nav className="hidden md:flex space-x-10">
               <a href="#features" className="text-gray-600 hover:text-primary">Features</a>
               <a href="#how-it-works" className="text-gray-600 hover:text-primary">How It Works</a>
-              <a href="#testimonials" className="text-gray-600 hover:text-primary">Testimonials</a>
-              <a href="#pricing" className="text-gray-600 hover:text-primary">Pricing</a>
             </nav>
             <div className="flex items-center space-x-4">
               <Link to="/login">
@@ -48,7 +47,7 @@ const Index = () => {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
             <div className="space-y-8 animate-slide-up">
               <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-gray-900">
-                Your Personal <span className="text-primary">AI Health</span> Assistant
+                Your Personal <span className="text-primary">Health & Fitness</span> Assistant
               </h1>
               <p className="text-xl text-gray-600">
                 Get personalized meal plans, workout routines, and health insights to achieve your wellness goals faster.
@@ -66,17 +65,14 @@ const Index = () => {
                   </Button>
                 </Link>
               </div>
-              <div className="flex items-center text-sm text-gray-500">
-                <CheckCircle2 className="h-5 w-5 text-secondary mr-2" />
-                No credit card required. Free 14-day trial.
-              </div>
+
             </div>
             <div className="relative animate-slide-up">
               <div className="absolute -top-10 -left-10 w-40 h-40 bg-blue-100 rounded-full mix-blend-multiply filter blur-2xl opacity-70"></div>
               <div className="absolute -bottom-10 -right-10 w-40 h-40 bg-green-100 rounded-full mix-blend-multiply filter blur-2xl opacity-70"></div>
               <img 
-                src="https://images.unsplash.com/photo-1505576399279-565b52d4ac71?auto=format&fit=crop&q=80&w=2787&ixlib=rb-4.0.3" 
-                alt="Healthy lifestyle" 
+                src = "https://img.freepik.com/free-photo/flat-lay-groceries-scale-wood-table_23-2148262107.jpg?t=st=1744519099~exp=1744522699~hmac=8fb7e1b858a27e86166e02346163dee35abc3b50733107551dee153237f619ab&w=1380"
+                alt="Health and Fitness" 
                 className="rounded-2xl shadow-2xl relative z-10 w-full"
               />
             </div>
@@ -89,11 +85,10 @@ const Index = () => {
         <div className="container mx-auto px-6">
           <div className="text-center mb-16">
             <h2 className="text-3xl md:text-4xl font-bold text-gray-900">
-              Powered by AI, Designed for You
+              Powered by HealthMate, Designed for You
             </h2>
             <p className="mt-4 text-xl text-gray-600 max-w-2xl mx-auto">
-              Our AI-driven platform adapts to your unique needs, preferences, and goals.
-            </p>
+            Designed to adapt — our plans change regularly to help you discover what works best for you.</p>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-10">
@@ -101,7 +96,7 @@ const Index = () => {
               <div className="p-3 bg-primary/10 rounded-xl inline-block mb-4">
                 <ChefHat className="h-8 w-8 text-primary" />
               </div>
-              <h3 className="text-xl font-bold mb-3">AI Meal Planning</h3>
+              <h3 className="text-xl font-bold mb-3">Meal Planning</h3>
               <p className="text-gray-600">
                 Personalized meal recommendations based on your dietary preferences, restrictions, and nutritional goals.
               </p>
@@ -112,11 +107,11 @@ const Index = () => {
                 </li>
                 <li className="flex items-start">
                   <CheckCircle2 className="h-5 w-5 text-secondary mr-2 mt-0.5" />
-                  <span className="text-sm text-gray-600">Grocery lists</span>
+                  <span className="text-sm text-gray-600">Nutrition tracking</span>
                 </li>
                 <li className="flex items-start">
-                  <CheckCircle2 className="h-5 w-5 text-secondary mr-2 mt-0.5" />
-                  <span className="text-sm text-gray-600">Nutrition tracking</span>
+                  <AlertCircle className="h-5 w-5 text-secondary mr-2 mt-0.5" />
+                  <span className="text-sm text-gray-600">Grocery lists</span>
                 </li>
               </ul>
             </div>
@@ -136,11 +131,11 @@ const Index = () => {
                 </li>
                 <li className="flex items-start">
                   <CheckCircle2 className="h-5 w-5 text-secondary mr-2 mt-0.5" />
-                  <span className="text-sm text-gray-600">Exercise tutorials</span>
+                  <span className="text-sm text-gray-600">Progress tracking</span>
                 </li>
                 <li className="flex items-start">
-                  <CheckCircle2 className="h-5 w-5 text-secondary mr-2 mt-0.5" />
-                  <span className="text-sm text-gray-600">Progress tracking</span>
+                  <AlertCircle className="h-5 w-5 text-secondary mr-2 mt-0.5" />
+                  <span className="text-sm text-gray-600">Exercise tutorials</span>
                 </li>
               </ul>
             </div>
@@ -199,9 +194,9 @@ const Index = () => {
               <div className="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-4">
                 <span className="text-xl font-bold text-primary">2</span>
               </div>
-              <h3 className="text-lg font-bold mb-2">Get AI Recommendations</h3>
+              <h3 className="text-lg font-bold mb-2">Get Recommendations</h3>
               <p className="text-gray-600 text-sm">
-                Our AI generates personalized meal plans and workouts tailored to your needs.
+                Our platform generates personalized meal plans and workouts tailored to your needs.
               </p>
             </div>
 
@@ -221,7 +216,7 @@ const Index = () => {
               </div>
               <h3 className="text-lg font-bold mb-2">Get Smarter Insights</h3>
               <p className="text-gray-600 text-sm">
-                Receive ongoing insights and adjustments as the AI learns more about you.
+                Receive ongoing insights and adjustments as the platform learns more about you.
               </p>
             </div>
           </div>
@@ -237,7 +232,7 @@ const Index = () => {
         </div>
       </section>
 
-      {/* Testimonials Section */}
+      {/* Testimonials Section
       <section id="testimonials" className="py-20">
         <div className="container mx-auto px-6">
           <div className="text-center mb-16">
@@ -341,9 +336,9 @@ const Index = () => {
             </div>
           </div>
         </div>
-      </section>
+      </section>*/}
 
-      {/* Pricing Section */}
+      {/* Pricing Section
       <section id="pricing" className="py-20 bg-gray-50">
         <div className="container mx-auto px-6">
           <div className="text-center mb-16">
@@ -354,119 +349,66 @@ const Index = () => {
               Choose the plan that fits your health and wellness needs
             </p>
           </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-5xl mx-auto">
-            <div className="bg-white p-8 rounded-xl border border-gray-100 shadow-sm">
-              <h3 className="text-xl font-bold mb-4">Basic</h3>
-              <div className="mb-6">
-                <span className="text-4xl font-bold">Free</span>
+          <div className="flex justify-center items-center">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-5xl justify-items-center">
+              <div className="bg-white p-8 rounded-xl border border-gray-100 shadow-sm text-center">
+                <h3 className="text-xl font-bold mb-4">Basic</h3>
+                <div className="mb-6">
+                  <span className="text-4xl font-bold">Free</span>
+                </div>
+                <ul className="space-y-4 mb-8">
+                  <li className="flex items-start">
+                    <CheckCircle2 className="h-5 w-5 text-secondary mr-2 mt-0.5" />
+                    <span className="text-gray-600">Basic meal recommendations</span>
+                  </li>
+                  <li className="flex items-start">
+                    <CheckCircle2 className="h-5 w-5 text-secondary mr-2 mt-0.5" />
+                    <span className="text-gray-600">Standard workout plans</span>
+                  </li>
+                  <li className="flex items-start">
+                    <CheckCircle2 className="h-5 w-5 text-secondary mr-2 mt-0.5" />
+                    <span className="text-gray-600">Basic health tracking</span>
+                  </li>
+                </ul>
+                <Button variant="outline" className="w-full">Get Started</Button>
               </div>
-              <ul className="space-y-4 mb-8">
-                <li className="flex items-start">
-                  <CheckCircle2 className="h-5 w-5 text-secondary mr-2 mt-0.5" />
-                  <span className="text-gray-600">Basic meal recommendations</span>
-                </li>
-                <li className="flex items-start">
-                  <CheckCircle2 className="h-5 w-5 text-secondary mr-2 mt-0.5" />
-                  <span className="text-gray-600">Standard workout plans</span>
-                </li>
-                <li className="flex items-start">
-                  <CheckCircle2 className="h-5 w-5 text-secondary mr-2 mt-0.5" />
-                  <span className="text-gray-600">Basic health tracking</span>
-                </li>
-              </ul>
-              <Button variant="outline" className="w-full">Get Started</Button>
-            </div>
-
-            <div className="bg-primary p-8 rounded-xl border border-gray-100 shadow-md transform scale-105">
-              <div className="flex justify-between items-center mb-4">
-                <h3 className="text-xl font-bold text-white">Premium</h3>
-                <Badge className="bg-white text-primary">Popular</Badge>
+              <div className="bg-primary p-8 rounded-xl border border-gray-100 shadow-md transform scale-105 text-center">
+                <div className="flex justify-between items-center mb-4">
+                  <h3 className="text-xl font-bold text-white">Premium</h3>
+                  <Badge className="bg-white text-primary">Popular</Badge>
+                </div>
+                <div className="mb-6 text-white">
+                  <span className="text-4xl font-bold">$9</span>
+                  <span>/month</span>
+                </div>
+                <ul className="space-y-4 mb-8">
+                  <li className="flex items-start text-white">
+                    <CheckCircle2 className="h-5 w-5 text-white mr-2 mt-0.5" />
+                    <span>Advanced AI meal planning</span>
+                  </li>
+                  <li className="flex items-start text-white">
+                    <CheckCircle2 className="h-5 w-5 text-white mr-2 mt-0.5" />
+                    <span>Personalized workout routines</span>
+                  </li>
+                  <li className="flex items-start text-white">
+                    <CheckCircle2 className="h-5 w-5 text-white mr-2 mt-0.5" />
+                    <span>Comprehensive health insights</span>
+                  </li>
+                  <li className="flex items-start text-white">
+                    <CheckCircle2 className="h-5 w-5 text-white mr-2 mt-0.5" />
+                    <span>Goal-based recommendations</span>
+                  </li>
+                  <li className="flex items-start text-white">
+                    <CheckCircle2 className="h-5 w-5 text-white mr-2 mt-0.5" />
+                    <span>Grocery lists & meal prep guides</span>
+                  </li>
+                </ul>
+                <Button className="w-full bg-white text-primary hover:bg-gray-100">Get Started</Button>
               </div>
-              <div className="mb-6 text-white">
-                <span className="text-4xl font-bold">$9</span>
-                <span>/month</span>
-              </div>
-              <ul className="space-y-4 mb-8">
-                <li className="flex items-start text-white">
-                  <CheckCircle2 className="h-5 w-5 text-white mr-2 mt-0.5" />
-                  <span>Advanced AI meal planning</span>
-                </li>
-                <li className="flex items-start text-white">
-                  <CheckCircle2 className="h-5 w-5 text-white mr-2 mt-0.5" />
-                  <span>Personalized workout routines</span>
-                </li>
-                <li className="flex items-start text-white">
-                  <CheckCircle2 className="h-5 w-5 text-white mr-2 mt-0.5" />
-                  <span>Comprehensive health insights</span>
-                </li>
-                <li className="flex items-start text-white">
-                  <CheckCircle2 className="h-5 w-5 text-white mr-2 mt-0.5" />
-                  <span>Goal-based recommendations</span>
-                </li>
-                <li className="flex items-start text-white">
-                  <CheckCircle2 className="h-5 w-5 text-white mr-2 mt-0.5" />
-                  <span>Grocery lists & meal prep guides</span>
-                </li>
-              </ul>
-              <Button className="w-full bg-white text-primary hover:bg-gray-100">Get Started</Button>
-            </div>
-
-            <div className="bg-white p-8 rounded-xl border border-gray-100 shadow-sm">
-              <h3 className="text-xl font-bold mb-4">Pro</h3>
-              <div className="mb-6">
-                <span className="text-4xl font-bold">$19</span>
-                <span className="text-gray-500">/month</span>
-              </div>
-              <ul className="space-y-4 mb-8">
-                <li className="flex items-start">
-                  <CheckCircle2 className="h-5 w-5 text-secondary mr-2 mt-0.5" />
-                  <span className="text-gray-600">Everything in Premium</span>
-                </li>
-                <li className="flex items-start">
-                  <CheckCircle2 className="h-5 w-5 text-secondary mr-2 mt-0.5" />
-                  <span className="text-gray-600">1-on-1 nutrition consultation</span>
-                </li>
-                <li className="flex items-start">
-                  <CheckCircle2 className="h-5 w-5 text-secondary mr-2 mt-0.5" />
-                  <span className="text-gray-600">Priority support</span>
-                </li>
-                <li className="flex items-start">
-                  <CheckCircle2 className="h-5 w-5 text-secondary mr-2 mt-0.5" />
-                  <span className="text-gray-600">Advanced analytics</span>
-                </li>
-              </ul>
-              <Button variant="outline" className="w-full">Get Started</Button>
             </div>
           </div>
         </div>
-      </section>
-
-      {/* CTA Section */}
-      <section className="py-20 text-center bg-gradient-to-r from-primary to-secondary text-white">
-        <div className="container mx-auto px-6">
-          <div className="max-w-3xl mx-auto">
-            <h2 className="text-3xl md:text-4xl font-bold mb-6">
-              Begin Your Health Transformation Today
-            </h2>
-            <p className="text-xl mb-8 opacity-90">
-              Join thousands of users who have transformed their health with our AI-powered platform.
-            </p>
-            <div className="flex flex-col sm:flex-row justify-center space-y-4 sm:space-y-0 sm:space-x-4">
-              <Link to="/register">
-                <Button size="lg" variant="secondary" className="bg-white text-primary hover:bg-gray-100 w-full sm:w-auto">
-                  Start Your Free Trial
-                </Button>
-              </Link>
-              <Link to="/dashboard">
-                <Button size="lg" variant="outline" className="bg-white text-primary hover:bg-gray-100 w-full sm:w-auto">
-                  View Demo
-                </Button>
-              </Link>
-            </div>
-          </div>
-        </div>
-      </section>
+      </section>*/}
 
       {/* Footer */}
       <footer className="bg-gray-800 text-gray-300 py-12">
@@ -478,7 +420,7 @@ const Index = () => {
                 <span className="text-xl font-bold text-white">HealthMate</span>
               </div>
               <p className="text-sm text-gray-400 mb-4">
-                Your AI-powered health and wellness companion.
+                Your health and wellness companion.
               </p>
               <div className="flex space-x-4">
                 <a href="#" className="text-gray-400 hover:text-white">
@@ -500,46 +442,18 @@ const Index = () => {
             </div>
             
             <div>
-              <h3 className="text-lg font-medium mb-4">Product</h3>
-              <ul className="space-y-2">
-                <li><a href="#features" className="text-gray-400 hover:text-white">Features</a></li>
-                <li><a href="#" className="text-gray-400 hover:text-white">Pricing</a></li>
-                <li><a href="#" className="text-gray-400 hover:text-white">Integrations</a></li>
-                <li><a href="#" className="text-gray-400 hover:text-white">FAQ</a></li>
-              </ul>
+              <h3 className="text-lg font-medium mb-4">Features</h3>
             </div>
             
             <div>
               <h3 className="text-lg font-medium mb-4">Company</h3>
-              <ul className="space-y-2">
-                <li><a href="#" className="text-gray-400 hover:text-white">About Us</a></li>
-                <li><a href="#" className="text-gray-400 hover:text-white">Blog</a></li>
-                <li><a href="#" className="text-gray-400 hover:text-white">Careers</a></li>
-                <li><a href="#" className="text-gray-400 hover:text-white">Contact</a></li>
-              </ul>
             </div>
             
             <div>
-              <h3 className="text-lg font-medium mb-4">Legal</h3>
-              <ul className="space-y-2">
-                <li><a href="#" className="text-gray-400 hover:text-white">Privacy Policy</a></li>
-                <li><a href="#" className="text-gray-400 hover:text-white">Terms of Service</a></li>
-                <li><a href="#" className="text-gray-400 hover:text-white">Cookie Policy</a></li>
-                <li><a href="#" className="text-gray-400 hover:text-white">GDPR</a></li>
-              </ul>
+              <h3 className="text-lg font-medium mb-4">About</h3>
             </div>
           </div>
           
-          <div className="border-t border-gray-700 mt-12 pt-8 flex flex-col md:flex-row justify-between items-center">
-            <p className="text-sm text-gray-400">
-              © 2025 HealthMate. All rights reserved.
-            </p>
-            <div className="mt-4 md:mt-0">
-              <p className="text-sm text-gray-400">
-                Made with <Heart className="h-4 w-4 inline text-primary" /> by the HealthMate Team
-              </p>
-            </div>
-          </div>
         </div>
       </footer>
     </div>

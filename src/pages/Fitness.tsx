@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "../components/ui/card";
 import { Button } from '../components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../components/ui/tabs";
@@ -15,7 +15,9 @@ import {
   Repeat2, 
   BarChart3, 
   Heart,
-  Play
+  Play,
+  RefreshCw,
+  Timer
 } from 'lucide-react';
 import { PieChart, Pie, Cell, ResponsiveContainer, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend } from 'recharts';
 
@@ -59,13 +61,251 @@ const workoutData = [
     calories: 300,
     category: "strength",
     level: "beginner",
-    equipment: ["Dumbbells", "Resistance Band"],
+    equipment: ["Resistance Band"],
     exercises: [
       { name: "Goblet Squats", sets: 3, reps: "12-15" },
       { name: "Romanian Deadlifts", sets: 3, reps: "10-12" },
       { name: "Walking Lunges", sets: 3, reps: "10 each leg" },
       { name: "Glute Bridges", sets: 3, reps: "15-20" },
       { name: "Calf Raises", sets: 3, reps: "20-25" }
+    ]
+  },
+  {
+    id: "workout-4",
+    title: "Core Strength",
+    duration: 25,
+    calories: 200,
+    category: "strength",
+    level: "beginner",
+    equipment: ["None"],
+    exercises: [
+      { name: "Crunches", sets: 3, reps: "15-20" },
+      { name: "Leg Raises", sets: 3, reps: "12-15" },
+      { name: "Russian Twists", sets: 3, reps: "20 twists" },
+      { name: "Plank Shoulder Taps", sets: 3, reps: "30 sec" },
+      { name: "Bicycle Crunches", sets: 3, reps: "15-20" }
+    ]
+  },
+  {
+    id: "workout-5",
+    title: "Cardio Blast",
+    duration: 20,
+    calories: 250,
+    category: "cardio",
+    level: "intermediate",
+    equipment: ["None"],
+    exercises: [
+      { name: "High Knees", sets: 3, reps: "30 sec" },
+      { name: "Burpees", sets: 3, reps: "10-12" },
+      { name: "Jump Squats", sets: 3, reps: "15-20" },
+      { name: "Mountain Climbers", sets: 3, reps: "30 sec" },
+      { name: "Skater Jumps", sets: 3, reps: "20" }
+    ]
+  },
+  {
+    id: "workout-6",
+    title: "Leg Day",
+    duration: 35,
+    calories: 300,
+    category: "strength",
+    level: "advanced",
+    equipment: ["Dumbbells"],
+    exercises: [
+      { name: "Squats", sets: 4, reps: "12-15" },
+      { name: "Lunges", sets: 4, reps: "10 each leg" },
+      { name: "Leg Press", sets: 4, reps: "10-12" },
+      { name: "Calf Raises", sets: 4, reps: "15-20" },
+      { name: "Leg Curls", sets: 4, reps: "12-15" }
+    ]
+  },
+  {
+    id: "workout-7",
+    title: "Yoga Flow",
+    duration: 45,
+    calories: 150,
+    category: "flexibility",
+    level: "beginner",
+    equipment: ["Yoga Mat"],
+    exercises: [
+      { name: "Sun Salutations", sets: 3, reps: "5 min" },
+      { name: "Warrior Poses", sets: 3, reps: "5 min" },
+      { name: "Tree Pose", sets: 3, reps: "2 min" },
+      { name: "Bridge Pose", sets: 3, reps: "2 min" },
+      { name: "Corpse Pose", sets: 3, reps: "5 min" }
+    ]
+  },
+  {
+    id: "workout-8",
+    title: "HIIT Cardio",
+    duration: 30,
+    calories: 350,
+    category: "cardio",
+    level: "advanced",
+    equipment: ["None"],
+    exercises: [
+      { name: "Jumping Jacks", sets: 3, reps: "30 sec" },
+      { name: "Burpees", sets: 3, reps: "15" },
+      { name: "High Knees", sets: 3, reps: "30 sec" },
+      { name: "Mountain Climbers", sets: 3, reps: "30 sec" },
+      { name: "Sprints", sets: 3, reps: "30 sec" }
+    ]
+  },
+  {
+    id: "workout-9",
+    title: "Upper Body Pump",
+    duration: 40,
+    calories: 280,
+    category: "strength",
+    level: "intermediate",
+    equipment: ["Dumbbells"],
+    exercises: [
+      { name: "Bench Press", sets: 3, reps: "10-12" },
+      { name: "Shoulder Press", sets: 3, reps: "10-12" },
+      { name: "Bicep Curls", sets: 3, reps: "12-15" },
+      { name: "Tricep Dips", sets: 3, reps: "12-15" },
+      { name: "Lat Pulldowns", sets: 3, reps: "10-12" }
+    ]
+  },
+  {
+    id: "workout-10",
+    title: "Full Body Stretch",
+    duration: 20,
+    calories: 100,
+    category: "flexibility",
+    level: "beginner",
+    equipment: ["Yoga Mat"],
+    exercises: [
+      { name: "Hamstring Stretch", sets: 3, reps: "30 sec" },
+      { name: "Quad Stretch", sets: 3, reps: "30 sec" },
+      { name: "Shoulder Stretch", sets: 3, reps: "30 sec" },
+      { name: "Tricep Stretch", sets: 3, reps: "30 sec" },
+      { name: "Neck Stretch", sets: 3, reps: "30 sec" }
+    ]
+  },
+  {
+    id: "workout-19",
+    title: "Mobility and Stretching",
+    duration: 30,
+    calories: 100,
+    category: "flexibility",
+    level: "beginner",
+    equipment: ["Yoga Mat"],
+    exercises: [
+      { name: "Cat-Cow Stretch", sets: 3, reps: "30 sec" },
+      { name: "Child's Pose", sets: 3, reps: "30 sec" },
+      { name: "Seated Forward Bend", sets: 3, reps: "30 sec" },
+      { name: "Butterfly Stretch", sets: 3, reps: "30 sec" },
+      { name: "Downward Dog", sets: 3, reps: "30 sec" }
+    ]
+  },
+  {
+    id: "workout-12",
+    title: "Strength Circuit",
+    duration: 30,
+    calories: 250,
+    category: "strength",
+    level: "intermediate",
+    equipment: ["Dumbbells"],
+    exercises: [
+      { name: "Deadlifts", sets: 3, reps: "10-12" },
+      { name: "Bent-over Rows", sets: 3, reps: "10-12" },
+      { name: "Shoulder Press", sets: 3, reps: "10-12" },
+      { name: "Bicep Curls", sets: 3, reps: "12-15" },
+      { name: "Tricep Extensions", sets: 3, reps: "12-15" }
+    ]
+  },
+  {
+    id: "workout-13",
+    title: "Pilates Core",
+    duration: 30,
+    calories: 180,
+    category: "flexibility",
+    level: "beginner",
+    equipment: ["Yoga Mat"],
+    exercises: [
+      { name: "Hundred", sets: 3, reps: "30 sec" },
+      { name: "Roll-Up", sets: 3, reps: "10" },
+      { name: "Leg Circles", sets: 3, reps: "10 each leg" },
+      { name: "Plank", sets: 3, reps: "30 sec" },
+      { name: "Side Plank", sets: 3, reps: "30 sec each side" }
+    ]
+  },
+  {
+    id: "workout-14",
+    title: "Endurance Run",
+    duration: 60,
+    calories: 600,
+    category: "cardio",
+    level: "advanced",
+    equipment: ["None"],
+    exercises: [
+      { name: "Warm-up Jog", sets: 1, reps: "10 min" },
+      { name: "Steady Pace Run", sets: 1, reps: "40 min" },
+      { name: "Cool Down Walk", sets: 1, reps: "10 min" }
+    ]
+  },
+  {
+    id: "workout-15",
+    title: "Bodyweight Strength",
+    duration: 30,
+    calories: 250,
+    category: "strength",
+    level: "beginner",
+    equipment: ["None"],
+    exercises: [
+      { name: "Push-ups", sets: 3, reps: "10-15" },
+      { name: "Bodyweight Squats", sets: 3, reps: "15-20" },
+      { name: "Lunges", sets: 3, reps: "10 each leg" },
+      { name: "Plank", sets: 3, reps: "30 sec" },
+      { name: "Burpees", sets: 3, reps: "10" }
+    ]
+  },
+  {
+    id: "workout-16",
+    title: "Power Yoga",
+    duration: 45,
+    calories: 200,
+    category: "flexibility",
+    level: "intermediate",
+    equipment: ["Yoga Mat"],
+    exercises: [
+      { name: "Sun Salutations", sets: 3, reps: "5 min" },
+      { name: "Warrior Poses", sets: 3, reps: "5 min" },
+      { name: "Tree Pose", sets: 3, reps: "2 min" },
+      { name: "Bridge Pose", sets: 3, reps: "2 min" },
+      { name: "Corpse Pose", sets: 3, reps: "5 min" }
+    ]
+  },
+  {
+    id: "workout-17",
+    title: "Strength and Conditioning",
+    duration: 40,
+    calories: 300,
+    category: "strength",
+    level: "advanced",
+    equipment: ["Dumbbells"],
+    exercises: [
+      { name: "Deadlifts", sets: 3, reps: "10-12" },
+      { name: "Bench Press", sets: 3, reps: "10-12" },
+      { name: "Squats", sets: 3, reps: "12-15" },
+      { name: "Shoulder Press", sets: 3, reps: "10-12" },
+      { name: "Bicep Curls", sets: 3, reps: "12-15" }
+    ]
+  },
+  {
+    id: "workout-18",
+    title: "Cardio and Core",
+    duration: 30,
+    calories: 250,
+    category: "cardio",
+    level: "intermediate",
+    equipment: ["None"],
+    exercises: [
+      { name: "Jumping Jacks", sets: 3, reps: "30 sec" },
+      { name: "Burpees", sets: 3, reps: "10-12" },
+      { name: "Mountain Climbers", sets: 3, reps: "30 sec" },
+      { name: "Plank", sets: 3, reps: "30 sec" },
+      { name: "Bicycle Crunches", sets: 3, reps: "15-20" }
     ]
   }
 ];
@@ -89,8 +329,80 @@ const workoutBreakdownData = [
 
 const COLORS = ['#0EA5E9', '#F97316', '#10B981', '#8B5CF6'];
 
+const CATEGORY_COLORS = {
+  cardio: COLORS[0], // '#0EA5E9'
+  strength: COLORS[1], // '#F97316'
+  flexibility: COLORS[2], // '#10B981'
+  recovery: COLORS[3] // '#8B5CF6'
+};
+
 const Fitness = () => {
   const [activeTab, setActiveTab] = useState("today");
+  const [currentWorkout, setCurrentWorkout] = useState(workoutData[0]); // Default to the first workout
+  const [activeTimers, setActiveTimers] = useState({}); // Track active timers for each workout
+  const [activeInterval, setActiveInterval] = useState(null); // Track the active interval ID
+
+  const startTimer = (workoutId) => {
+    // Stop the previous timer
+    if (activeInterval) {
+      clearInterval(activeInterval);
+    }
+
+    // Reset all timers and start the new one
+    setActiveTimers({ [workoutId]: 0 });
+
+    const interval = setInterval(() => {
+      setActiveTimers((prevTimers) => {
+        if (prevTimers[workoutId] !== undefined) {
+          return {
+            ...prevTimers,
+            [workoutId]: prevTimers[workoutId] + 1 // Increment timer
+          };
+        }
+        clearInterval(interval); // Clear interval if timer is removed
+        return prevTimers;
+      });
+    }, 1000);
+
+    setActiveInterval(interval); // Save the new interval ID
+  };
+
+  const stopTimer = () => {
+    if (activeInterval) {
+      clearInterval(activeInterval); // Stop the active timer
+      setActiveInterval(null);
+      setActiveTimers({}); // Clear all timers
+    }
+  };
+
+  const formatTime = (seconds) => {
+    const mins = Math.floor(seconds / 60);
+    const secs = seconds % 60;
+    return `${mins}:${secs < 10 ? '0' : ''}${secs}`;
+  };
+
+  useEffect(() => {
+    const pushWorkoutsToDatabase = async () => {
+      try {
+        const response = await fetch("https://your-database-api-url.com/workouts", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify(workoutData)
+        });
+        if (response.ok) {
+          console.log("Workouts successfully pushed to the database.");
+        } else {
+          console.error("Failed to push workouts to the database.");
+        }
+      } catch (error) {
+        console.error("Error pushing workouts to the database:", error);
+      }
+    };
+
+    pushWorkoutsToDatabase();
+  }, []);
 
   return (
     <div className="container mx-auto p-4">
@@ -186,12 +498,25 @@ const Fitness = () => {
             <CardHeader>
               <div className="flex items-center justify-between">
                 <CardTitle>Today's Workout</CardTitle>
-                <Badge className="bg-accent text-white">
-                  <Flame className="h-4 w-4 mr-1" />
-                  Recommended
-                </Badge>
+                <div className="flex items-center gap-2">
+                  <Badge className="bg-accent text-white">
+                    <Flame className="h-4 w-4 mr-1" />
+                    Recommended
+                  </Badge>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => {
+                      const randomWorkout = workoutData[Math.floor(Math.random() * workoutData.length)];
+                      setCurrentWorkout(randomWorkout); // Update the current workout
+                    }}
+                  >
+                    <RefreshCw className="w-4 h-4 mr-2" />
+                    Generate Plan
+                  </Button>
+                </div>
               </div>
-              <CardDescription>Full Body HIIT - Intermediate</CardDescription>
+              <CardDescription>{currentWorkout.title} - {currentWorkout.level.charAt(0).toUpperCase() + currentWorkout.level.slice(1)}</CardDescription>
             </CardHeader>
             <CardContent>
               <div className="grid gap-6 md:grid-cols-3 mb-6">
@@ -199,21 +524,21 @@ const Fitness = () => {
                   <Clock className="h-5 w-5 text-primary mr-3" />
                   <div>
                     <h4 className="text-sm font-medium">Duration</h4>
-                    <p className="text-2xl font-bold">30 min</p>
+                    <p className="text-2xl font-bold">{currentWorkout.duration} min</p>
                   </div>
                 </div>
                 <div className="flex items-center">
                   <Flame className="h-5 w-5 text-accent mr-3" />
                   <div>
                     <h4 className="text-sm font-medium">Calories</h4>
-                    <p className="text-2xl font-bold">320 kcal</p>
+                    <p className="text-2xl font-bold">{currentWorkout.calories} kcal</p>
                   </div>
                 </div>
                 <div className="flex items-center">
                   <Dumbbell className="h-5 w-5 text-secondary mr-3" />
                   <div>
                     <h4 className="text-sm font-medium">Equipment</h4>
-                    <p className="text-2xl font-bold">None</p>
+                    <p className="text-2xl font-bold">{currentWorkout.equipment.join(', ')}</p>
                   </div>
                 </div>
               </div>
@@ -221,7 +546,7 @@ const Fitness = () => {
               <div className="space-y-4">
                 <h3 className="font-medium">Exercises</h3>
                 <div className="grid gap-4">
-                  {workoutData[0].exercises.map((exercise, index) => (
+                  {currentWorkout.exercises.map((exercise, index) => (
                     <div key={index} className="flex items-center justify-between p-3 border rounded-md hover:bg-gray-50">
                       <div className="flex items-center">
                         <div className="flex items-center justify-center w-8 h-8 rounded-full bg-primary/10 text-primary mr-3">
@@ -237,11 +562,21 @@ const Fitness = () => {
                 </div>
               </div>
             </CardContent>
-            <CardFooter>
-              <Button className="w-full">
-                <Play className="h-4 w-4 mr-2" />
-                Start Workout
-              </Button>
+            <CardFooter className="flex justify-center">
+              {activeTimers[currentWorkout.id] !== undefined ? (
+                <div
+                  className="flex items-center text-primary cursor-pointer"
+                  onClick={stopTimer} // Stop the timer when clicked
+                >
+                  <Timer className="h-5 w-5 mr-2" />
+                  <span>{formatTime(activeTimers[currentWorkout.id])}</span>
+                </div>
+              ) : (
+                <Button className="w-full md:w-auto" onClick={() => startTimer(currentWorkout.id)}>
+                  <Play className="h-4 w-4 mr-2" />
+                  Start Workout
+                </Button>
+              )}
             </CardFooter>
           </Card>
 
@@ -388,9 +723,9 @@ const Fitness = () => {
                             {isCompleted ? (
                               <Badge className="bg-secondary text-white">Completed</Badge>
                             ) : isToday ? (
-                              <Button size="sm">
+                              <Button size="sm" onClick={() => startTimer(workout.id)}>
                                 <Play className="h-4 w-4 mr-2" />
-                                Start
+                                Start Workout
                               </Button>
                             ) : (
                               <Badge variant="outline" className="text-gray-600">Upcoming</Badge>
@@ -471,7 +806,7 @@ const Fitness = () => {
                       <CardTitle className="text-lg">{workout.title}</CardTitle>
                       <CardDescription>{workout.category.charAt(0).toUpperCase() + workout.category.slice(1)} • {workout.level.charAt(0).toUpperCase() + workout.level.slice(1)}</CardDescription>
                     </div>
-                    <Badge className={workout.category === 'cardio' ? 'bg-primary' : 'bg-secondary'}>
+                    <Badge style={{ backgroundColor: CATEGORY_COLORS[workout.category] }}>
                       {workout.category}
                     </Badge>
                   </div>
@@ -499,13 +834,23 @@ const Fitness = () => {
                         <span className="text-gray-500">{exercise.sets} × {exercise.reps}</span>
                       </div>
                     ))}
-                    {workout.exercises.length > 3 && (
-                      <div className="text-sm text-primary text-center">+ {workout.exercises.length - 3} more exercises</div>
-                    )}
                   </div>
                 </CardContent>
-                <CardFooter className="mt-auto pt-4">
-                  <Button className="w-full">Start Workout</Button>
+                <CardFooter className="flex justify-center mt-auto pt-4">
+                  {activeTimers[workout.id] !== undefined ? (
+                    <div
+                      className="flex items-center text-primary cursor-pointer"
+                      onClick={stopTimer} // Stop the timer when clicked
+                    >
+                      <Timer className="h-5 w-5 mr-2" />
+                      <span>{formatTime(activeTimers[workout.id])}</span>
+                    </div>
+                  ) : (
+                    <Button className="w-full md:w-auto" onClick={() => startTimer(workout.id)}>
+                      <Play className="h-4 w-4 mr-2" />
+                      Start Workout
+                    </Button>
+                  )}
                 </CardFooter>
               </Card>
             ))}

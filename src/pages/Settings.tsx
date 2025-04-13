@@ -52,7 +52,11 @@ const Settings = () => {
         }
 
         const data = await response.json();
-        setSettings(data);
+        setSettings({
+          ...data,
+          emailNotifications: false, // Uncheck email notifications
+          pushNotifications: false, // Uncheck push notifications
+        });
       } catch (error) {
         console.error('Error fetching settings:', error);
         toast.error('Failed to load settings');
@@ -89,6 +93,8 @@ const Settings = () => {
         throw new Error('Failed to update settings');
       }
 
+      const updatedSettings = await response.json();
+      setSettings(updatedSettings); // Update the UI with the saved settings
       toast.success('Settings updated successfully');
     } catch (error) {
       console.error('Error saving settings:', error);
@@ -287,7 +293,7 @@ const Settings = () => {
                 <Switch 
                   id="pushNotifications"
                   checked={settings.pushNotifications}
-                  onCheckedChange={(checked) => handleChange('pushNotifications', checked)}
+                  onCheckedChange={(unchecked) => handleChange('pushNotifications', unchecked)}
                 />
               </div>
               

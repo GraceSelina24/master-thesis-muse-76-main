@@ -171,7 +171,7 @@ const Profile = () => {
           </Button>
           {editableProfile && (
             <>
-              <Button variant="primary" onClick={handleSaveClick}>
+              <Button variant="default" onClick={handleSaveClick}>
                 Save
               </Button>
               <Button variant="secondary" onClick={handleCancelClick}>
