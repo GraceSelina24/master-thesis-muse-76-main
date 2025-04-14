@@ -65,7 +65,7 @@ app.use((err, req, res, next) => {
 });
 
 // Authentication routes
-app.post('/api/users/register', async (req, res) => {
+app.post('/api/users/onboarding', async (req, res) => {
   try {
     const { email, password, name } = req.body;
     console.log('Registration attempt:', { email, name });

@@ -72,7 +72,7 @@ const authenticate = async (req, res, next) => {
 };
 
 // Register a user
-app.post('/api/users/register', async (req, res) => {
+app.post('/api/users/onboarding', async (req, res) => {
   try {
     const { name, email, password } = req.body;
 
@@ -153,9 +153,9 @@ app.get('/api/profile', authenticate, async (req, res) => {
       name: req.user.name,
       email: req.user.email,
       height: 180,
-      weight: 75,
-      age: 30,
-      gender: 'Male',
+      weight: 65,
+      age: 24,
+      gender: 'Female',
       activityLevel: 'Moderate',
       dietaryPreferences: ['Vegetarian', 'Low Sugar', 'High Protein'],
       healthGoals: ['Weight Loss', 'Muscle Gain', 'Better Sleep'],

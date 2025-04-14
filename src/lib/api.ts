@@ -9,7 +9,7 @@ const handleResponse = async (response: Response) => {
 };
 
 export const register = async (name: string, email: string, password: string) => {
-  const response = await fetch(`${API_URL}/users/register`, {
+  const response = await fetch(`${API_URL}/users/onboarding`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ name, email, password }),

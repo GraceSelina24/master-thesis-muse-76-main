@@ -61,6 +61,7 @@ export const LoginForm: React.FC = () => {
               <Input
                 id="password"
                 type="password"
+                placeholder="******"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required
@@ -112,7 +113,7 @@ export const LoginForm: React.FC = () => {
           <div className="text-center mt-4">
             <p className="text-sm text-gray-600">
               Don't have an account?{' '}
-              <Link to="/register" className="font-medium text-primary hover:text-primary/80">
+              <Link to="/onboarding" className="font-medium text-primary hover:text-primary/80">
                 Sign up
               </Link>
             </p>

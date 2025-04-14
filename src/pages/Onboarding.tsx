@@ -1,15 +1,8 @@
-
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
-import { 
-  Select, 
-  SelectContent, 
-  SelectItem, 
-  SelectTrigger, 
-  SelectValue 
-} from '@/components/ui/select';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Label } from '@/components/ui/label';
 import { Progress } from '@/components/ui/progress';
@@ -17,10 +10,13 @@ import { useToast } from '@/hooks/use-toast';
 
 const Onboarding = () => {
   const [step, setStep] = useState(1);
-  const [progress, setProgress] = useState(25);
+  const [progress, setProgress] = useState(20);
   const { toast } = useToast();
 
   // User profile data
+  const [name, setName] = useState('');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
   const [gender, setGender] = useState('');
   const [age, setAge] = useState('');
   const [height, setHeight] = useState('');
@@ -51,25 +47,21 @@ const Onboarding = () => {
   ];
 
   const handleDietaryChange = (dietary: string) => {
-    setDietaryPreferences(prev => 
-      prev.includes(dietary) 
-        ? prev.filter(item => item !== dietary) 
-        : [...prev, dietary]
+    setDietaryPreferences((prev) =>
+      prev.includes(dietary) ? prev.filter((item) => item !== dietary) : [...prev, dietary]
     );
   };
 
   const handleAllergyChange = (allergy: string) => {
-    setAllergies(prev => 
-      prev.includes(allergy) 
-        ? prev.filter(item => item !== allergy) 
-        : [...prev, allergy]
+    setAllergies((prev) =>
+      prev.includes(allergy) ? prev.filter((item) => item !== allergy) : [...prev, allergy]
     );
   };
 
   const handleNextStep = () => {
     if (step < 4) {
       setStep(step + 1);
-      setProgress(progress + 25);
+      setProgress(progress + 20);
     } else {
       completeOnboarding();
     }
@@ -78,29 +70,31 @@ const Onboarding = () => {
   const handlePrevStep = () => {
     if (step > 1) {
       setStep(step - 1);
-      setProgress(progress - 25);
+      setProgress(progress - 20);
     }
   };
 
   const completeOnboarding = () => {
     // This would normally send the data to your backend
     toast({
-      title: "Profile setup complete!",
-      description: "Your personalized health journey begins now.",
+      title: 'Profile setup complete!',
+      description: 'Your personalized health journey begins now.',
     });
-    
+
     // Redirect to dashboard
     window.location.href = '/dashboard';
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 p-4">
+    <div className="min-h-screen flex items-center justify-center bg-gray-50 p-4"
+    style={{
+      backgroundImage: 'url(/health-bg.jpg)'
+    }}
+    >
       <Card className="w-full max-w-2xl shadow-lg animate-slide-up">
         <CardHeader className="space-y-2 text-center">
-          <CardTitle className="text-2xl font-bold">Set Up Your Health Profile</CardTitle>
-          <CardDescription>
-            Help us personalize your experience
-          </CardDescription>
+          <CardTitle className="text-2xl font-bold">Let's Set Up Your Health Profile</CardTitle>
+          <CardDescription>Help us personalize your experience</CardDescription>
           <Progress value={progress} className="h-2 mt-4" />
         </CardHeader>
         <CardContent>
@@ -108,6 +102,36 @@ const Onboarding = () => {
             <div className="space-y-4 animate-slide-up">
               <h3 className="text-lg font-medium">Basic Information</h3>
               <div className="grid gap-4 grid-cols-1 md:grid-cols-2">
+                <div className="space-y-2">
+                  <Label htmlFor="name">Full Name</Label>
+                  <Input
+                    id="name"
+                    type="text"
+                    placeholder="John Doe"
+                    value={name}
+                    onChange={(e) => setName(e.target.value)}
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="email">Email</Label>
+                  <Input
+                    id="email"
+                    type="email"
+                    placeholder="name@example.com"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="password">Password</Label>
+                  <Input
+                    id="password"
+                    type="password"
+                    placeholder="******"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                  />
+                </div>
                 <div className="space-y-2">
                   <Label htmlFor="gender">Gender</Label>
                   <Select value={gender} onValueChange={setGender}>
@@ -130,26 +154,6 @@ const Onboarding = () => {
                     placeholder="Your age"
                     value={age}
                     onChange={(e) => setAge(e.target.value)}
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="height">Height (cm)</Label>
-                  <Input
-                    id="height"
-                    type="number"
-                    placeholder="Your height in cm"
-                    value={height}
-                    onChange={(e) => setHeight(e.target.value)}
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="weight">Current Weight (kg)</Label>
-                  <Input
-                    id="weight"
-                    type="number"
-                    placeholder="Your weight in kg"
-                    value={weight}
-                    onChange={(e) => setWeight(e.target.value)}
                   />
                 </div>
               </div>
@@ -176,7 +180,6 @@ const Onboarding = () => {
                     </SelectContent>
                   </Select>
                 </div>
-                
                 {goal === 'lose-weight' || goal === 'gain-weight' ? (
                   <div className="space-y-2">
                     <Label htmlFor="goalWeight">Target Weight (kg)</Label>
@@ -189,7 +192,6 @@ const Onboarding = () => {
                     />
                   </div>
                 ) : null}
-                
                 <div className="space-y-2">
                   <Label htmlFor="activityLevel">Activity Level</Label>
                   <Select value={activityLevel} onValueChange={setActivityLevel}>

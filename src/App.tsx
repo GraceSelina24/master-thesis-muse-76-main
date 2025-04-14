@@ -43,7 +43,7 @@ const App: React.FC = () => {
           <Routes>
             <Route path="/" element={<Index />} />
             <Route path="/login" element={<LoginForm />} />
-            <Route path="/register" element={<RegisterForm />} />
+            {/*<Route path="/register" element={<onbarding />} />*/}
             <Route path="/onboarding" element={<Onboarding />} />
             
             <Route element={<RequireAuth><MainLayout /></RequireAuth>}>
