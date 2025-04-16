@@ -1,7 +1,7 @@
 import React, { createContext, useState, useEffect, useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from '@/hooks/use-toast';
-import { authApi, userApi } from '@/lib/api';
+import { auth } from '../lib/api'; // Updated import to use `auth` instead of `authApi`
 
 type User = {
   id: string;
@@ -13,7 +13,7 @@ type AuthContextType = {
   user: User | null;
   loading: boolean;
   signIn: (email: string, password: string) => Promise<void>;
-  signUp: (email: string, password: string) => Promise<void>;
+  signUp: (email: string, password: string, name: string) => Promise<void>; // Updated to include `name` argument
   signOut: () => Promise<void>;
   signInWithGoogle: () => Promise<void>;
 };
@@ -29,19 +29,16 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     // Check if user is already logged in
     const checkAuthStatus = async () => {
       try {
-        const userId = localStorage.getItem('userId');
-        
-        if (userId) {
-          try {
-            const userData = await userApi.getProfile(userId);
-            setUser(userData);
-          } catch (error) {
-            localStorage.removeItem('userId');
-            setUser(null);
-          }
+        const token = localStorage.getItem('token');
+        if (token) {
+          const userData = await auth.getCurrentUser(); // Replaced `userApi.getProfile` with `auth.getCurrentUser`
+          setUser(userData);
+        } else {
+          setUser(null);
         }
       } catch (error) {
         console.error('Auth status check error:', error);
+        setUser(null);
       } finally {
         setLoading(false);
       }
@@ -53,7 +50,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const signIn = async (email: string, password: string) => {
     try {
       setLoading(true);
-      const data = await authApi.login(email, password);
+      const data = await auth.login(email, password); // Updated to use `auth`
       
       if (data.user) {
         setUser(data.user);
@@ -80,14 +77,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
-  const signUp = async (email: string, password: string) => {
+  const signUp = async (email: string, password: string, name: string) => {
     try {
       setLoading(true);
-      const data = await authApi.register(email, password);
-      
+      const data = await auth.register(name, email, password); // Added `name` as the first argument
       setUser(data.user);
-      localStorage.setItem('userId', data.user.id);
-      navigate('/onboarding');
+      localStorage.setItem('token', data.token);
+      navigate('/register');
       
       toast({
         title: "Sign up successful",
@@ -95,6 +91,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       });
     } catch (error) {
       console.error('Error signing up:', error);
+      toast({
+        title: "Sign up failed",
+        description: "An error occurred during registration. Please try again.",
+        variant: "destructive",
+      });
     } finally {
       setLoading(false);
     }
@@ -103,7 +104,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const signOut = async () => {
     try {
       setLoading(true);
-      await authApi.logout();
+      await auth.logout(); // Updated to use `auth`
       setUser(null);
       localStorage.removeItem('userId');
       navigate('/');

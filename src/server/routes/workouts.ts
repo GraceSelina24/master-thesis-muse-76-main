@@ -1,11 +1,10 @@
 import { Router } from 'express';
-import { prisma } from '../prisma';
-import { authenticateToken } from '../middleware/auth';
-
+import { prisma } from '../../lib/db'; // Corrected named import for `prisma`
+import { authenticate } from '../middleware/auth'; // Placeholder for `authenticate` function
 const router = Router();
 
 // Get all workouts for the authenticated user
-router.get('/', authenticateToken, async (req, res) => {
+router.get('/', authenticate, async (req, res) => {
   try {
     const workouts = await prisma.workout.findMany({
       where: {
@@ -23,7 +22,7 @@ router.get('/', authenticateToken, async (req, res) => {
 });
 
 // Add a new workout
-router.post('/', authenticateToken, async (req, res) => {
+router.post('/', authenticate, async (req, res) => {
   try {
     const { name, description, duration, calories } = req.body;
     

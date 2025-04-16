@@ -12,7 +12,6 @@ import Calendar from '@/pages/Calendar';
 import MealPlanner from '@/pages/MealPlanner';
 import Fitness from '@/pages/Fitness';
 import HealthInsights from '@/pages/HealthInsights';
-import Onboarding from '@/pages/Onboarding';
 import Index from '@/pages/Index';
 import MainLayout from '@/components/layout/MainLayout';
 import { LoginForm } from './components/auth/LoginForm';
@@ -43,8 +42,7 @@ const App: React.FC = () => {
           <Routes>
             <Route path="/" element={<Index />} />
             <Route path="/login" element={<LoginForm />} />
-            {/*<Route path="/register" element={<onbarding />} />*/}
-            <Route path="/onboarding" element={<Onboarding />} />
+            <Route path="/register" element={<Register />} />
             
             <Route element={<RequireAuth><MainLayout /></RequireAuth>}>
               <Route path="/dashboard" element={<Dashboard />} />

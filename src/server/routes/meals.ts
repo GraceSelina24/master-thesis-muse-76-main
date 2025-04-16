@@ -1,11 +1,11 @@
 import { Router } from 'express';
-import { prisma } from '../prisma';
-import { authenticateToken } from '../middleware/auth';
+import { prisma } from '../../lib/db'; // Corrected named import for `prisma`
+import { authenticate } from '../middleware/auth'; // Placeholder for `authenticate` function
 
 const router = Router();
 
 // Get all meals for the authenticated user
-router.get('/', authenticateToken, async (req, res) => {
+router.get('/', authenticate, async (req, res) => { // Updated middleware
   try {
     const meals = await prisma.meal.findMany({
       where: {
@@ -15,35 +15,30 @@ router.get('/', authenticateToken, async (req, res) => {
         date: 'desc',
       },
     });
-    res.json(meals);
+    res.status(200).json(meals);
   } catch (error) {
     console.error('Error fetching meals:', error);
-    res.status(500).json({ error: 'Failed to fetch meals' });
+    res.status(500).json({ message: 'Internal server error' });
   }
 });
 
 // Add a new meal
-router.post('/', authenticateToken, async (req, res) => {
+router.post('/', authenticate, async (req, res) => { // Updated middleware
   try {
-    const { name, description, calories, protein, carbs, fat } = req.body;
-    
-    const meal = await prisma.meal.create({
+    const { name, calories, date } = req.body;
+    const newMeal = await prisma.meal.create({
       data: {
         name,
-        description,
-        calories: parseInt(calories),
-        protein: protein ? parseFloat(protein) : null,
-        carbs: carbs ? parseFloat(carbs) : null,
-        fat: fat ? parseFloat(fat) : null,
+        calories,
+        date,
         userId: req.user.id,
       },
     });
-    
-    res.json(meal);
+    res.status(201).json(newMeal);
   } catch (error) {
-    console.error('Error adding meal:', error);
-    res.status(500).json({ error: 'Failed to add meal' });
+    console.error('Error creating meal:', error);
+    res.status(500).json({ message: 'Internal server error' });
   }
 });
 
-export default router; 
+export default router;

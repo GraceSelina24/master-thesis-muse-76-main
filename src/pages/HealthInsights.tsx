@@ -135,7 +135,7 @@ const HealthInsights = () => {
         <div className="flex justify-between items-center">
           <div>
             <h1 className="text-3xl font-bold text-primary mb-2">Health Insights</h1>
-            <p className="text-gray-600">AI-powered analysis of your health and fitness data</p>
+            <p className="text-gray-600">Analysis of your health and fitness data</p>
           </div>
           <Button variant="outline">
             <Download className="h-4 w-4 mr-2" />
@@ -198,7 +198,7 @@ const HealthInsights = () => {
 
       <Card className="mb-8">
         <CardHeader>
-          <CardTitle>Latest AI-Generated Insights</CardTitle>
+          <CardTitle>Latest Generated Insights</CardTitle>
           <CardDescription>Personalized observations based on your health data</CardDescription>
         </CardHeader>
         <CardContent>

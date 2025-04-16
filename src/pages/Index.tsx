@@ -33,7 +33,7 @@ const Index = () => {
               <Link to="/login">
                 <Button variant="outline">Sign In</Button>
               </Link>
-              <Link to="/onboarding">
+              <Link to="/register">
                 <Button>Get Started</Button>
               </Link>
             </div>
@@ -53,7 +53,7 @@ const Index = () => {
                 Get personalized meal plans, workout routines, and health insights to achieve your wellness goals faster.
               </p>
               <div className="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4">
-                <Link to="/onboarding">
+                <Link to="/register">
                   <Button size="lg" className="w-full sm:w-auto">
                     Start Your Journey
                     <ArrowRight className="ml-2 h-5 w-5" />
@@ -222,7 +222,7 @@ const Index = () => {
           </div>
           
           <div className="mt-16 text-center">
-            <Link to="/onboarding">
+            <Link to="/register">
               <Button size="lg">
                 Start Your Health Journey
                 <ArrowRight className="ml-2 h-5 w-5" />

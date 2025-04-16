@@ -72,7 +72,7 @@ const authenticate = async (req, res, next) => {
 };
 
 // Register a user
-app.post('/api/users/onboarding', async (req, res) => {
+app.post('/api/users/register', async (req, res) => {
   try {
     const { name, email, password } = req.body;
 
